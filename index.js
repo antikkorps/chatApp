@@ -35,9 +35,18 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("a user connected")
-  socket.on("chat message", (msg) => {
+  socket.on("chat message", async (msg) => {
     console.log("message: " + msg)
-    io.emit("chat message", msg)
+    let result
+    try {
+      // store the message in the database
+      result = await db.run("INSERT INTO messages (content) VALUES (?)", msg)
+    } catch (e) {
+      // TODO handle the failure
+      return
+    }
+    // include the offset with the message
+    io.emit("chat message", msg, result.lastID)
   })
   socket.on("disconnect", () => {
     console.log("user disconnected")
