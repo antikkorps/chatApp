@@ -1,8 +1,12 @@
 {
-  "name": "socket-chat-example",
+  "name": "tattoo-chat-server",
   "version": "0.0.1",
-  "description": "my first socket.io app",
+  "description": "my Tattoo Chat Server",
   "type": "module",
+
+  "scripts": {
+    "dev": "node --watch index.js"
+  },
   "dependencies": {
     "express": "^4.19.2",
     "socket.io": "^4.7.5",
