@@ -6,6 +6,10 @@ COPY package*.json ./
 
 RUN npm install
 
+COPY prisma prisma/
+
+RUN npx prisma generate
+
 # Copy all the file from app
 COPY . .
 

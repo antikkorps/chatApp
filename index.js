@@ -1,31 +1,46 @@
 import express from "express"
 import dotenv from "dotenv"
+import { PrismaClient } from "@prisma/client"
 import { createServer } from "node:http"
 import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
 import { Server } from "socket.io"
-import sqlite3 from "sqlite3"
+// import sqlite3 from "sqlite3"
 import { open } from "sqlite"
 
 dotenv.config()
 
-// open the database file
-const db = await open({
-  filename: "chat.db",
-  driver: sqlite3.Database,
-})
-
-// create our 'messages' table (you can ignore the 'client_offset' column for now)
-await db.exec(`
-  CREATE TABLE IF NOT EXISTS messages (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      client_offset TEXT UNIQUE,
-      content TEXT
-  );
-`)
-
+const prisma = new PrismaClient()
 const app = express()
 const server = createServer(app)
+
+// // open the database file
+// const db = await open({
+//   filename: "chat.db",
+//   driver: sqlite3.Database,
+// })
+
+// // create our 'messages' table (you can ignore the 'client_offset' column for now)
+// await db.exec(`
+//   CREATE TABLE IF NOT EXISTS messages (
+//       id INTEGER PRIMARY KEY AUTOINCREMENT,
+//       client_offset TEXT UNIQUE,
+//       content TEXT
+//   );
+// `)
+
+try {
+  // store the message in the database
+  result = await prisma.message.create({
+    data: {
+      content: msg,
+    },
+  })
+} catch (e) {
+  // TODO handle the failure
+  console.error(e)
+}
+
 const io = new Server(server, {
   connectionStateRecovery: {},
 })
