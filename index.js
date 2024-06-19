@@ -26,6 +26,8 @@ io.on("connection", async (socket) => {
   console.log("a user connected")
   socket.on("chat message", async (msg, clientOffset) => {
     let result
+    console.log("cientOffset : ", clientOffset)
+    console.log("message : ", msg)
     try {
       // store the message in the database
       result = await prisma.message.create({
