@@ -16,11 +16,11 @@ datasource db {
 // Models
 
 model Message {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  client_offset String @unique
-  content   String
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  clientOffset String? @unique
+  content       String
   // author    User     @relation(fields: [authorId], references: [id])
   // authorId  String
 }

@@ -12,21 +12,6 @@ const prisma = new PrismaClient()
 const app = express()
 const server = createServer(app)
 
-// // open the database file
-// const db = await open({
-//   filename: "chat.db",
-//   driver: sqlite3.Database,
-// })
-
-// // create our 'messages' table (you can ignore the 'client_offset' column for now)
-// await db.exec(`
-//   CREATE TABLE IF NOT EXISTS messages (
-//       id INTEGER PRIMARY KEY AUTOINCREMENT,
-//       client_offset TEXT UNIQUE,
-//       content TEXT
-//   );
-// `)
-
 const io = new Server(server, {
   connectionStateRecovery: {},
 })
@@ -39,14 +24,16 @@ app.get("/", (req, res) => {
 
 io.on("connection", async (socket) => {
   console.log("a user connected")
-  socket.on("chat message", async (msg) => {
-    console.log("message: " + msg)
+  socket.on("chat message", async (msg, clientOffset) => {
+    console.log("message reçu par le serveur: " + msg)
+    console.log("clientOffset: " + clientOffset)
     let result
     try {
       // store the message in the database
       result = await prisma.message.create({
         data: {
           content: msg,
+          client_offset: clientOffset,
         },
       })
     } catch (e) {
@@ -61,15 +48,23 @@ io.on("connection", async (socket) => {
   if (!socket.recovered) {
     // if the connection state recovery was not successful
     try {
-      await db.each(
-        "SELECT id, content FROM messages WHERE id > ?",
-        [socket.handshake.auth.serverOffset || 0],
-        (_err, row) => {
-          socket.emit("chat message", row.content, row.id)
-        }
-      )
+      const serverOffset = socket.handshake.auth.serverOffset || 0
+      const messages = await prisma.message.findMany({
+        where: {
+          id: {
+            gt: serverOffset,
+          },
+        },
+        orderBy: {
+          id: "asc",
+        },
+      })
+      messages.forEach((message) => {
+        socket.emit("chat message", message.content, message.id)
+      })
     } catch (e) {
-      // something went wrong
+      // handle error
+      console.error(e)
     }
   }
 
