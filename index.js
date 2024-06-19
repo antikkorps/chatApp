@@ -25,8 +25,6 @@ app.get("/", (req, res) => {
 io.on("connection", async (socket) => {
   console.log("a user connected")
   socket.on("chat message", async (msg, clientOffset) => {
-    console.log("message reçu par le serveur: " + msg)
-    console.log("clientOffset: " + clientOffset)
     let result
     try {
       // store the message in the database
@@ -52,7 +50,7 @@ io.on("connection", async (socket) => {
       const messages = await prisma.message.findMany({
         where: {
           id: {
-            gt: serverOffset,
+            gt: serverOffset.toString(),
           },
         },
         orderBy: {
