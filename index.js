@@ -27,18 +27,6 @@ const server = createServer(app)
 //   );
 // `)
 
-try {
-  // store the message in the database
-  result = await prisma.message.create({
-    data: {
-      content: msg,
-    },
-  })
-} catch (e) {
-  // TODO handle the failure
-  console.error(e)
-}
-
 const io = new Server(server, {
   connectionStateRecovery: {},
 })
@@ -56,9 +44,14 @@ io.on("connection", async (socket) => {
     let result
     try {
       // store the message in the database
-      result = await db.run("INSERT INTO messages (content) VALUES (?)", msg)
+      result = await prisma.message.create({
+        data: {
+          content: msg,
+        },
+      })
     } catch (e) {
       // TODO handle the failure
+      console.error(e)
       return
     }
     // include the offset with the message
