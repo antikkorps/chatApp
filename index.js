@@ -5,6 +5,7 @@ import { createServer } from "node:http"
 import { fileURLToPath } from "node:url"
 import { dirname, join } from "node:path"
 import { Server } from "socket.io"
+import jwt from "jsonwebtoken"
 
 dotenv.config()
 
@@ -21,6 +22,22 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 app.get("/", (req, res) => {
   res.sendFile(join(__dirname, "index.html"))
 })
+
+// to connext the user to the socket
+// io.use((socket, next) => {
+//   const token = socket.handshake.token
+//   if (token) {
+//     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+//       if (err) {
+//         return next(new Error("Authentication error"))
+//       }
+//       socket.decoded = decoded
+//       next()
+//     })
+//   } else {
+//     next(new Error("Authentication error"))
+//   }
+// })
 
 io.on("connection", async (socket) => {
   console.log("a user connected")
