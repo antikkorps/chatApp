@@ -67,6 +67,7 @@
         auth: {
           serverOffset: 0,
         },
+        // This retries generate a conflict because it tries to add the same client_offset three times
         //retries: 3,
         ackTimeout: 10000,
       })
